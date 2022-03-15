@@ -1,6 +1,6 @@
 import utils as util
 import pandas as pd
-from ae_helpers import generator, get_ae_model, plot_loss_and_acc
+from ae_helpers import generator, get_another_model, plot_loss_and_acc
 from configurators import train_config
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -19,6 +19,7 @@ X_valid = train_df[train_df['Subset'] == 'validation']
 t_conf = train_config()
  
 train_datagen = ImageDataGenerator(rescale = 1./255)
+valid_datagen = ImageDataGenerator(rescale = 1./255)
 
 train_generator = train_datagen.flow_from_dataframe(
             dataframe   =X_train,
@@ -43,9 +44,9 @@ validation_generator = train_datagen.flow_from_dataframe(
 train_steps = len(X_train.index)//t_conf.BATCH_SIZE
 val_steps = len(X_valid.index)//t_conf.BATCH_SIZE
 
-ae_model = get_ae_model(t_conf)
+ae_model = get_another_model(t_conf)
 
-es =EarlyStopping(monitor='val_loss', patience=5)
+es =EarlyStopping(monitor='val_loss', patience=3)
 mc =ModelCheckpoint("out/mc_model",monitor="val_loss",save_best_only=True)
 
 history=ae_model.fit(train_generator,

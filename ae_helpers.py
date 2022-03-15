@@ -18,6 +18,8 @@ from configurators import train_config
 import utils as util
 import matplotlib.pyplot as plt
 
+from models import ConvAutoencoder
+
 def random_binary(p):
     if(random.random()<p):
         return 1
@@ -49,6 +51,12 @@ def get_ae_model(t_conf):
     decoded = Conv2D(3, (3, 3), activation='relu', padding='same')(x)
 
     autoencoder = Model(input_img, decoded)
+    print(autoencoder.summary())
+    autoencoder.compile(optimizer='Adam', loss='mse')
+    return autoencoder
+
+def get_another_model(t_conf):
+    (encoder, decoder, autoencoder) = ConvAutoencoder.build(t_conf.IMG_HEIGHT, t_conf.IMG_WIDTH, 3)
     print(autoencoder.summary())
     autoencoder.compile(optimizer='Adam', loss='mse')
     return autoencoder
