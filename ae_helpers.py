@@ -28,19 +28,23 @@ def random_binary(p):
 def get_ae_model(t_conf):
 
     input_img = Input(shape=(t_conf.IMG_HEIGHT, t_conf.IMG_WIDTH, 3))  
-    x = Conv2D(filters = 8, kernel_size = (3, 3), activation='relu', padding='same')(input_img)
+    x = Conv2D(filters = 16, kernel_size = (3, 3), activation='relu', padding='same')(input_img)
     x = MaxPooling2D(pool_size = (2, 2), padding='same')(x)
-    x = Conv2D(filters = 16, kernel_size = (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D(pool_size = (2, 2), padding='same')(x) 
     x = Conv2D(filters = 32, kernel_size = (3, 3), activation='relu', padding='same')(x)
+    x = MaxPooling2D(pool_size = (2, 2), padding='same')(x) 
+    x = Conv2D(filters = 64, kernel_size = (3, 3), activation='relu', padding='same')(x)
+    x = MaxPooling2D(pool_size = (2, 2), padding='same')(x) 
+    x = Conv2D(filters = 128, kernel_size = (3, 3), activation='relu', padding='same')(x)
     encoded = MaxPooling2D(pool_size = (2, 2), padding='same')(x)
 
     # The decoding process
-    x = Conv2D(32, (3, 3), activation='relu', padding='same')(encoded)
+    x = Conv2D(128, (3, 3), activation='relu', padding='same')(encoded)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(32, (3, 3), activation='relu', padding='same')(x)
     x = UpSampling2D((2, 2))(x)
     x = Conv2D(16, (3, 3), activation='relu', padding='same')(x)
-    x = UpSampling2D((2, 2))(x)
-    x = Conv2D(8, (3, 3), activation='relu', padding='same')(x)
     x = UpSampling2D((2, 2))(x)
     decoded = Conv2D(3, (3, 3), activation='relu', padding='same')(x)
 
@@ -92,11 +96,11 @@ def try_samples(model, t_conf):
     im_list = os.listdir(d_path)#Disease
     for im in im_list:
         x = io.imread(d_path+im)
-        x = resize(x, (t_conf.IMG_HEIGHT, t_conf.IMG_WIDTH))
-        img_in = image.img_to_array(x)/255.
+        img_in = resize(x, (t_conf.IMG_HEIGHT, t_conf.IMG_WIDTH))
+        #img_in = image.img_to_array(x)/255.
         pred = model.predict(np.reshape(img_in, (1,t_conf.IMG_HEIGHT, t_conf.IMG_WIDTH, 3)))
         out_im = np.reshape(pred, (t_conf.IMG_HEIGHT, t_conf.IMG_WIDTH, 3))
-        util.show_images([x,out_im])
+        util.show_images([img_in,out_im])
 
 
 
@@ -125,9 +129,7 @@ def plot_loss_and_acc(history, save=False, saveDir='out/', fname=''):
     plt.show(block=False)
     plt.close()
 
-
-"""
-ae_model = util.load_model("auotencoder1")
-t_conf = train_config()
-try_samples(ae_model, t_conf)
-"""
+if (__name__ == "__main__"):
+    ae_model = util.load_model("auotencoder1")
+    t_conf = train_config()
+    try_samples(ae_model, t_conf)
