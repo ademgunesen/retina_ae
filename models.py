@@ -14,7 +14,7 @@ import numpy as np
 
 class ConvAutoencoder:
 	@staticmethod
-	def build(width, height, depth, filters=(16,32,64,128), latentDim=32):
+	def build(width, height, depth, filters=(16,32,64,128), latentDim=256):
 		# initialize the input shape to be "channels last" along with
 		# the channels dimension itself
 		# channels dimension itself
